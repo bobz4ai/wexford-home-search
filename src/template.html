@@ -1,0 +1,232 @@
+<title>Wexford Home Search</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/*__LEAFLET_CSS__*/
+/* Layout: a field binder — header with the brief, a map of the North Hills, then tabbed sections of cards. */
+:root{
+  --bg:#f5f6f3; --surface:#ffffff; --ink:#1f2a27; --muted:#5b6762; --line:#d9ded9;
+  --accent:#2f5d50; --accent-soft:#e3ece8;
+  --ok:#2e6b3f; --ok-bg:#e5f1e7; --warn:#8a5a00; --warn-bg:#fbf0d9; --no:#9b3328; --no-bg:#f8e6e3;
+  --c-senior:#7a4ea3; --c-rental:#1f6fae; --c-owner:#2f7d5a; --c-listing:#c46a12; --c-sale:#5f6b73;
+  --display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --body:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141a18; --surface:#1c2421; --ink:#e7ece9; --muted:#9aa8a2; --line:#2e3935;
+  --accent:#8cc5b2; --accent-soft:#22332d;
+  --ok:#8fd19e; --ok-bg:#1d3324; --warn:#f0c46b; --warn-bg:#3a2f16; --no:#f19a8e; --no-bg:#3a1f1b;
+  --c-senior:#b892dc; --c-rental:#6fb0e6; --c-owner:#73c49c; --c-listing:#f0a35a; --c-sale:#a9b4bb;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a18; --surface:#1c2421; --ink:#e7ece9; --muted:#9aa8a2; --line:#2e3935;
+  --accent:#8cc5b2; --accent-soft:#22332d;
+  --ok:#8fd19e; --ok-bg:#1d3324; --warn:#f0c46b; --warn-bg:#3a2f16; --no:#f19a8e; --no-bg:#3a1f1b;
+  --c-senior:#b892dc; --c-rental:#6fb0e6; --c-owner:#73c49c; --c-listing:#f0a35a; --c-sale:#a9b4bb;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+header.top{padding-block:28px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(1.8rem,4.5vw,2.6rem);font-weight:650;margin-top:4px}
+.lede{max-width:68ch;color:var(--muted);margin:10px 0 0}
+.brief{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding:0;list-style:none}
+.brief li{background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:4px 12px;font-size:.88rem}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;font-size:.88rem;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+main{padding-block:22px 48px;display:grid;gap:28px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.plan h2{font-size:1.35rem}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:12px;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding-left:34px;position:relative;font-size:.95rem}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--surface);font-weight:700;font-size:.82rem;display:grid;place-items:center}
+.steps b{display:block}
+#map{height:min(62vh,520px);min-height:340px;border-radius:var(--r);border:1px solid var(--line);background:var(--accent-soft);z-index:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.88rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.mapnote{font-size:.85rem;color:var(--muted);margin-top:6px}
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:10px;z-index:5;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+nav.tabs button{font:inherit;font-size:.92rem;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+nav.tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+nav.tabs .n{font-variant-numeric:tabular-nums;opacity:.8;font-weight:500}
+section.group{display:grid;gap:14px}
+section.group>header h2{font-size:1.5rem}
+section.group>header p{margin:4px 0 0;color:var(--muted);max-width:72ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h3{font-size:1.15rem;font-weight:650}
+.card .sub{font-size:.88rem;color:var(--muted);margin-top:2px}
+.kv{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.9rem;font-variant-numeric:tabular-nums}
+.kv .price{font-weight:700}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 9px;border-radius:999px;align-self:flex-start}
+.tag.match{background:var(--ok-bg);color:var(--ok)}
+.tag.near,.tag.verify{background:var(--warn-bg);color:var(--warn)}
+.tag.long{background:var(--no-bg);color:var(--no)}
+.typebar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.type{font-size:.78rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
+ul.fit,ul.miss{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:.92rem}
+ul.fit li,ul.miss li{padding-left:22px;position:relative}
+ul.fit li::before{content:"✓";position:absolute;left:2px;color:var(--ok);font-weight:700}
+ul.miss li::before{content:"✗";position:absolute;left:3px;color:var(--no);font-weight:700}
+.ask{font-size:.88rem;background:var(--accent-soft);border-radius:8px;padding:8px 10px}
+.ask b{font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.9rem;margin-top:auto;padding-top:4px;border-top:1px dashed var(--line)}
+.actions a{font-weight:600;text-decoration:none}
+.actions a:hover{text-decoration:underline}
+.phone{font-size:.88rem;color:var(--muted);user-select:all}
+.mapbtn{font:inherit;font-size:.9rem;font-weight:600;color:var(--accent);background:none;border:0;padding:0;cursor:pointer}
+.empty{color:var(--muted);font-style:italic}
+details.method{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px}
+details.method summary{cursor:pointer;font-weight:600}
+details.method ul{margin:8px 0 0;padding-left:20px;max-width:75ch}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-block:18px 30px}
+.leaflet-popup-content{font-family:var(--body);font-size:13px}
+.leaflet-popup-content b{font-size:14px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="eyebrow">North Hills &amp; southern Butler County · Rent first, buy only if plans change</div>
+  <h1>Wexford Home Search</h1>
+  <p class="lede">One-floor homes with an attached garage near Orchard Hill Church, for a move by the end of April 2027. Each place below is checked against the same list. Green means it fits, amber means it's close or needs a phone call to confirm.</p>
+  <ul class="brief" aria-label="What we're looking for">
+    <li>All living on one floor</li><li>Primary bedroom + laundry on the main floor</li><li>Attached 2-car garage</li><li>2+ full baths</li><li>3 bedrooms (2 if roomy)</li><li>Dishwasher, good cabinets, pantry a plus</li><li>Walk-in shower preferred</li><li>Lawn &amp; snow handled</li><li>Rent up to $3,500/mo</li><li>55+ communities OK · no pets</li>
+  </ul>
+  <div class="meta"><span>Updated <b>__UPDATED__</b></span><span>Next update <b>__NEXT__</b></span><span>Distances are straight-line miles from Orchard Hill Church, 2551 Brandt School Rd</span></div>
+</div></header>
+
+<main class="wrap">
+  <section class="plan" aria-labelledby="plan-h">
+    <h2 id="plan-h">How to use this list</h2>
+    <ol class="steps">
+      <li><b>Now through January</b>Call the senior-cottage and rental communities. Ask about April 2027 availability and get on waitlists. Waitlists cost little and are the slow part.</li>
+      <li><b>February–March</b>Rentals for April start appearing. This page switches to weekly updates then.</li>
+      <li><b>Today's rentals</b>Most will be leased long before April. They're here to show what the money buys and which neighborhoods have the right kind of home.</li>
+      <li><b>Homes for sale</b>Only if plans change. They're also a guide to which patio-home communities to watch for owners who rent.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="map-h">
+    <h2 id="map-h" style="font-size:1.35rem;margin-bottom:10px">Map</h2>
+    <div id="map" role="region" aria-label="Map of places on this list"></div>
+    <div class="legend" id="legend"></div>
+    <p class="mapnote">The dashed circle is 5 miles from Orchard Hill Church. Tap a pin for details.</p>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="Filter the list"></nav>
+  <div id="groups" style="display:grid;gap:34px"></div>
+
+  <details class="method">
+    <summary>How this list was put together</summary>
+    <ul>
+      <li>Rentals and homes for sale come from Redfin, which also carries many Zillow rental listings. Zillow blocked direct searching. Community details come from each community's own website, cited on its card.</li>
+      <li>Listings rarely say everything. When a listing leaves out something on our list, the card says so and suggests what to ask, rather than guessing.</li>
+      <li>Checked and ruled out: Cumberland Woods Village, Vincentian Terrace Place, The Village at St. Barnabas, Hampton Fields Village and Concordia at Cabot (apartments without garages); Masonic Village at Sewickley (no rental option, about $8,400/mo plus entrance fee); Hunters Point and Park Place townhomes (bedrooms upstairs); Venango Trails (no one-level plans found).</li>
+      <li>"Photos" links open the listing or community website, where the photos and floor plans belong to their owners.</li>
+      <li>Prices and availability change quickly. Treat anything here as a lead to confirm by phone.</li>
+    </ul>
+  </details>
+</main>
+
+<footer><div class="wrap">Prepared for a private family home search. Not affiliated with any listing site, builder or community. Prices and availability as of the update date above.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+const CENTER = {lat:40.6074, lng:-80.0886, name:"Orchard Hill Church"};
+const MERCY = {lat:40.4363, lng:-79.9853, name:"UPMC Mercy", addr:"1400 Locust St, Pittsburgh, PA 15219"};
+const TYPES = {
+  senior:{label:"Senior cottages", color:"--c-senior"},
+  rental:{label:"Rental communities", color:"--c-rental"},
+  owner:{label:"Patio-home & 55+ communities", color:"--c-owner"},
+  listing:{label:"Rentals on the market now", color:"--c-listing"},
+  sale:{label:"For sale (if plans change)", color:"--c-sale"}
+};
+const GROUP_TEXT = {
+  senior:"Independent-living homes on a retirement campus: one floor, a garage, upkeep handled, and care on site if needs ever change. The two St. Barnabas communities rent by the month. The others charge large entrance fees and are here for comparison.",
+  rental:"Purpose-built rental communities with one-floor homes and attached garages are rare here. This is the only one found besides White Tail Ridge (listed under senior cottages).",
+  owner:"Neighborhoods built for one-floor living, where the association handles lawn and snow. Homes here are mostly owned, but owners do rent them out, so these are the places to watch for an April rental.",
+  listing:"Rentals listed today within about 10 miles. They'll mostly be gone by April; they show what the budget buys.",
+  sale:"One-level homes for sale within about 10 miles, under roughly $550,000. Only relevant if you decide to buy."
+};
+const TIER = {match:"Fits the list", near:"Close, with trade-offs", verify:"Promising, call to confirm", long:"Long shot"};
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function miles(a,b,c,d){const R=3958.8,t=x=>x*Math.PI/180;const dl=t(c-a),dn=t(d-b);const h=Math.sin(dl/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function gdir(from,to){return "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(from)+"&destination="+encodeURIComponent(to)}
+
+const items=[];
+for(const [k,arr] of Object.entries(DATA.groups)) for(const x of arr){x.group=k; x.d=miles(CENTER.lat,CENTER.lng,x.lat,x.lng); items.push(x);}
+const TORD={match:0,verify:1,near:2,long:3};
+for(const k in DATA.groups) DATA.groups[k].sort((a,b)=>TORD[a.tier]-TORD[b.tier]||a.d-b.d);
+
+let map=null, markers={};
+function initMap(){
+  if(!window.L){document.getElementById("map").innerHTML='<p class="empty" style="padding:16px">The map couldn\'t load here. The list below has every place.</p>';return;}
+  map=L.map("map",{scrollWheelZoom:false}).setView([CENTER.lat,CENTER.lng],11);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map).once("tileerror",()=>{document.querySelector(".mapnote").textContent="The street map background didn't load in this view; the pins are still in the right places. The dashed circle is 5 miles from Orchard Hill Church.";});
+  L.circle([CENTER.lat,CENTER.lng],{radius:8046.7,color:css("--accent"),weight:2,dashArray:"6 6",fill:false}).addTo(map);
+  L.circleMarker([CENTER.lat,CENTER.lng],{radius:8,color:css("--ink"),weight:3,fillColor:css("--surface"),fillOpacity:1}).addTo(map).bindPopup("<b>Orchard Hill Church</b><br>2551 Brandt School Rd, Wexford");
+  const pts=[];
+  for(const x of items){
+    const m=L.circleMarker([x.lat,x.lng],{radius:x.group==="sale"?6:8,color:css("--surface"),weight:2,fillColor:css(TYPES[x.group].color),fillOpacity:.95}).addTo(map);
+    m.bindPopup(`<b>${esc(x.name)}</b><br>${esc(x.town)}<br>${esc(x.price||"")}${x.price?"<br>":""}${x.d.toFixed(1)} mi from Orchard Hill<br><a href="#card-${x.id}">See details</a>`);
+    markers[x.id]=m; pts.push([x.lat,x.lng]);
+  }
+  pts.push([CENTER.lat,CENTER.lng]);
+  map.fitBounds(pts,{padding:[24,24]});
+}
+function legend(){
+  const el=document.getElementById("legend");
+  el.innerHTML=`<span><i class="dot" style="background:var(--surface);box-shadow:0 0 0 3px var(--ink)"></i>Orchard Hill Church</span>`+
+    Object.entries(TYPES).map(([k,t])=>`<span><i class="dot" style="background:var(${t.color})"></i>${t.label}</span>`).join("");
+}
+function card(x){
+  const t=TYPES[x.group];
+  const kv=[x.price?`<span class="price">${esc(x.price)}</span>`:"", x.hoa?`<span>${esc(x.hoa)}</span>`:"", `<span>${x.d.toFixed(1)} mi</span>`].join("");
+  const links=(x.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("");
+  const addr=x.address||`${x.name}, ${x.town.split("·")[0].split("(")[0].trim()}, PA`;
+  return `<article class="card" id="card-${x.id}">
+    <div class="typebar"><span class="type"><i class="dot" style="background:var(${t.color})"></i>${t.label}</span><span class="tag ${x.tier}">${TIER[x.tier]}</span></div>
+    <div><h3>${esc(x.name)}</h3><div class="sub">${esc(x.town)}</div></div>
+    <div class="kv">${kv}</div>
+    ${x.specs?`<div class="kv">${esc(x.specs)}</div>`:""}
+    ${x.fits?.length?`<ul class="fit">${x.fits.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>`:""}
+    ${x.missing?.length?`<ul class="miss">${x.missing.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>`:""}
+    ${x.ask?`<div class="ask"><b>Ask:</b> ${esc(x.ask)}</div>`:""}
+    ${x.phone?`<div class="phone">☎ ${esc(x.phone)}</div>`:""}
+    <div class="actions">${links}
+      <a href="${gdir("2551 Brandt School Rd, Wexford, PA 15090",addr)}" target="_blank" rel="noopener">Drive from Orchard Hill ↗</a>
+      <a href="${gdir(addr,MERCY.addr)}" target="_blank" rel="noopener">Drive to UPMC Mercy ↗</a>
+      ${map?`<button class="mapbtn" data-id="${x.id}">Show on map</button>`:""}
+    </div>
+  </article>`;
+}
+let current="all";
+function render(){
+  const g=document.getElementById("groups");
+  g.innerHTML=Object.keys(TYPES).filter(k=>DATA.groups[k]?.length && (current==="all"||current===k)).map(k=>`
+    <section class="group" aria-labelledby="h-${k}"><header><h2 id="h-${k}">${TYPES[k].label}</h2><p>${GROUP_TEXT[k]}</p></header>
+    <div class="cards">${DATA.groups[k].map(card).join("")}</div></section>`).join("");
+  g.querySelectorAll(".mapbtn").forEach(b=>b.addEventListener("click",()=>{const m=markers[b.dataset.id]; if(!m)return; document.getElementById("map").scrollIntoView({behavior:"smooth",block:"center"}); map.setView(m.getLatLng(),14); m.openPopup();}));
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===current)));
+  for(const x of items){const m=markers[x.id]; if(!m)continue; const on=current==="all"||current===x.group; m.setStyle({opacity:on?1:.15,fillOpacity:on?.95:.12});}
+}
+function tabs(){
+  const n=k=>k==="all"?items.length:(DATA.groups[k]||[]).length;
+  document.getElementById("tabs").innerHTML=[["all","Everything"],...Object.entries(TYPES).filter(([k])=>n(k)).map(([k,t])=>[k,t.label])]
+    .map(([k,l])=>`<button type="button" id="tab-${k}" data-k="${k}" aria-pressed="false">${l}<span class="n">${n(k)}</span></button>`).join("");
+  document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{current=b.dataset.k;try{localStorage.setItem("whs-tab",current)}catch(e){};render();}));
+}
+try{const s=localStorage.getItem("whs-tab"); if(s && (s==="all"||DATA.groups[s])) current=s;}catch(e){}
+legend(); initMap(); tabs(); render();
+</script>

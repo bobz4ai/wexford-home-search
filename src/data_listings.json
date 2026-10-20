@@ -1,0 +1,101 @@
+{
+  "rentals": [
+    {
+      "id": "r-cottonwood",
+      "name": "221 Cottonwood Ln",
+      "town": "Wexford (Marshall Twp)",
+      "lat": 40.6290, "lng": -80.0711,
+      "price": "$3,200/mo",
+      "specs": "3 bd · 2.5 ba · 2,050 sq ft · built-in garage",
+      "tier": "verify",
+      "fits": ["Public records list it as a one-story home (ranch), with a finished lower level below", "Close in: under 2 miles from Orchard Hill", "Lawn care included", "Kitchen getting granite and new cabinet fronts; all 3 baths getting quartz", "Primary suite with its own bath", "Washer and dryer in the home"],
+      "missing": ["Listing doesn't say where the laundry is (main floor or lower level)", "Garage size not stated", "Snow removal not mentioned", "Comes up for rent now; would need to still be open in spring"],
+      "ask": "Is the laundry on the main floor? Is the garage 2-car? Is snow removal included? Would the owner hold it or re-list in spring?",
+      "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Wexford/221-Cottonwood-Ln-15090/home/74772165"}],
+      "phone": "724-776-3686 (listing agent)"
+    },
+    {
+      "id": "r-tenpoint",
+      "name": "516 Ten Point Ln",
+      "town": "Cranberry Township",
+      "lat": 40.6890, "lng": -80.1267,
+      "price": "$2,095/mo",
+      "specs": "3 bd · 2 ba townhouse · 2-car garage",
+      "tier": "verify",
+      "fits": ["2-car garage", "Owner pays the HOA, which usually covers lawn and snow", "Two full baths", "Well under budget"],
+      "missing": ["Listing doesn't say how many floors or where the bedrooms and laundry are", "Kitchen lists a fridge and stove only; no dishwasher mentioned", "Plain finishes (carpet, vinyl)", "About 6 miles out"],
+      "ask": "Is it one level? Where are the bedrooms and laundry? Is there a dishwasher? Does the HOA handle lawn and snow?",
+      "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Cranberry-Township/516-Ten-Point-Ln-16066/home/74797143"}],
+      "phone": "833-634-0811 (HomeRiver Group)"
+    },
+    {
+      "id": "r-sussex",
+      "name": "411 Sussex Dr",
+      "town": "Cranberry Township",
+      "lat": 40.6913, "lng": -80.1154,
+      "price": "$2,500/mo",
+      "specs": "4 bd · 2 ba ranch · 1,352 sq ft · 1-car garage",
+      "tier": "near",
+      "fits": ["True one-level ranch", "Renovated kitchen with quartz counters and plenty of pantry space", "Two full baths", "Washer and dryer in the home"],
+      "missing": ["Only a 1-car attached garage (long driveway for the second car)", "Fenced yard; lawn and snow are probably the tenant's job", "Smaller rooms: 4 bedrooms in 1,352 sq ft", "About 6 miles out"],
+      "ask": "Who handles lawn and snow? Is there a walk-in shower?",
+      "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Cranberry-Township/411-Sussex-Dr-16066/home/74790383"}],
+      "phone": ""
+    },
+    {
+      "id": "r-grandview",
+      "name": "1301 Grandview Ave",
+      "town": "Glenshaw (Shaler Twp)",
+      "lat": 40.5212, "lng": -79.9553,
+      "price": "$2,650/mo",
+      "specs": "3 bd + in-law suite · 2 full baths on main · attached garage",
+      "tier": "near",
+      "fits": ["One-level living: primary suite, 2 more bedrooms, 2 full baths and laundry all on the main floor", "Attached garage", "Brick home on a corner lot", "Available December 1"],
+      "missing": ["Shaler is southeast, outside your target area (about 9 miles)", "Garage size not stated", "Lawn and snow are probably the tenant's job", "Basement in-law suite is space you'd pay for and not use"],
+      "ask": "Is the garage 2-car? Is there a step-free way in from the garage?",
+      "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Glenshaw/1301-Grandview-Ave-15116/home/74596383"}],
+      "phone": "724-933-6300 (listing agent)"
+    },
+    {
+      "id": "r-sonie",
+      "name": "305 Sonie Dr",
+      "town": "Franklin Park (Sewickley mailing address)",
+      "lat": 40.5684, "lng": -80.1138,
+      "price": "$2,100/mo",
+      "specs": "3 bd · 2.5 ba townhouse · first-floor primary",
+      "tier": "near",
+      "fits": ["Primary bedroom and laundry on the first floor", "About 3 miles from Orchard Hill", "Community pool"],
+      "missing": ["Two other bedrooms are upstairs", "Galley kitchen", "Garage not mentioned"],
+      "ask": "Is there an attached garage? Is the first-floor bath a full bath with a shower?",
+      "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Sewickley/305-Sonie-Dr-15143/home/74439944"}],
+      "phone": ""
+    },
+    {
+      "id": "r-adamspointe",
+      "name": "248 Adams Pointe Blvd #2",
+      "town": "Mars (Adams Twp)",
+      "lat": 40.6845, "lng": -80.0362,
+      "price": "$1,950/mo",
+      "specs": "2 bd · 2 ba condo · one level",
+      "tier": "near",
+      "fits": ["Everything on one level, including laundry off the kitchen", "Two full baths, one with each bedroom", "Gated community with pool, fitness center, walking trail and staff security"],
+      "missing": ["Likely an upstairs unit (it has a balcony), so there may be stairs to the door", "Parking is in a garage lot, not an attached garage", "Small for two people: 2 bedrooms, no third room"],
+      "ask": "Is the unit on the ground floor or is there an elevator? Where is the garage?",
+      "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Mars/248-Adams-Pointe-Blvd-16046/unit-2/home/73660433"}],
+      "phone": "724-933-6300 (listing agent)"
+    }
+  ],
+  "sales": [
+    {"id":"s-huckleberry200","name":"200 Huckleberry Ct","town":"Wexford · Blueberry Hill 55+","lat":40.6387,"lng":-80.0959,"price":"$302,000","hoa":"$300/mo HOA","specs":"2 bd · 2 ba · 1,120 sq ft · 2-car garage · one level","tier":"match","fits":["55+ community 2 miles from Orchard Hill","One-level living, maintenance-free","Updated kitchen with quartz counters"],"missing":["Small: 1,120 sq ft and only 2 bedrooms"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Wexford/200-Huckleberry-Ct-15090/home/73560981"}]},
+    {"id":"s-cobblestone132","name":"132 Cobblestone Dr","town":"Ohio Twp (Avonworth)","lat":40.5396,"lng":-80.0871,"price":"$435,000","hoa":"$146/mo + $136/quarter HOA","specs":"2 bd · 2 ba · 1,538 sq ft · 2-car garage · one level","tier":"match","fits":["One-level patio home","Kitchen with large pantry and island","Primary suite with walk-in closet; shower redone in 2023","Community pool and clubhouse"],"missing":["2 bedrooms only","About 5 miles south"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Pittsburgh/132-Cobblestone-Dr-15237/home/74447534"}]},
+    {"id":"s-cobblestone142","name":"142 Cobblestone Dr","town":"Ohio Twp (Avonworth)","lat":40.5392,"lng":-80.0862,"price":"$474,900","hoa":"$196/mo HOA","specs":"2 bd · 2 ba · 1,864 sq ft · 2-car garage · one level","tier":"match","fits":["One-level patio home","Large granite kitchen island","Community pool and clubhouse"],"missing":["2 bedrooms only","About 5 miles south"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Pittsburgh/142-Cobblestone-Dr-15237/home/74447524"}]},
+    {"id":"s-presidents","name":"113 Presidents Dr","town":"Sewickley Ridge 55+ (Ohio Twp)","lat":40.5372,"lng":-80.1198,"price":"$487,900","hoa":"$326/mo HOA","specs":"2 bd · 2 ba · 1,760 sq ft · 2-car garage · single level","tier":"match","fits":["55+ community built by Traditions of America (2016)","Single level with sunroom and heated four-season room","Vaulted great room open to the kitchen"],"missing":["2 bedrooms only","About 5 miles southwest"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Sewickley/113-Presidents-Dr-15143/home/109232826"}]},
+    {"id":"s-linden","name":"118 Linden Ct","town":"Seven Fields","lat":40.6908,"lng":-80.0645,"price":"$489,000","hoa":"$370/mo HOA","specs":"2 bd + bonus room · 2.5 ba · 2,300 sq ft · 2-car garage","tier":"match","fits":["First-floor, maintenance-free patio home","Granite kitchen, stainless appliances, hardwood floors","Bonus room that could be a third bedroom or office"],"missing":["Listing mentions a bedroom and full bath on the first floor; check where the second bedroom is"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Seven-Fields/118-Linden-Ct-16046/home/73666160"}]},
+    {"id":"s-ashford11","name":"11 Ashford Dr","town":"Cranberry Township","lat":40.6874,"lng":-80.1258,"price":"$350,000","hoa":"$380/mo HOA","specs":"3 bd · 2.5 ba · 2-car garage · main-level living","tier":"near","fits":["Patio home with renovated kitchen and new floors","Clubhouse and pool"],"missing":["Has an upstairs loft/guest suite (the main-level rooms are what you'd use)"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Cranberry-Township/11-Ashford-Dr-16066/home/73649085"}]},
+    {"id":"s-isleworth2084","name":"2084 Isleworth Ln","town":"Cranberry · Villas at Isleworth","lat":40.7012,"lng":-80.1262,"price":"$485,000","hoa":"$385/mo HOA","specs":"2 bd + den · 2 ba · 1,821 sq ft · 2-car garage · one level","tier":"match","fits":["One-level Weaver patio home","Updated kitchen with double pantries","Main-level laundry; sunroom; den could be a third bedroom"],"missing":["About 7 miles north"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Cranberry-Twp/2084-Isleworth-Ln-16066/home/74813686"}]},
+    {"id":"s-isleworth2104","name":"2104 Isleworth Ln","town":"Cranberry · Villas at Isleworth","lat":40.7011,"lng":-80.1269,"price":"$445,000","hoa":"$385/mo HOA","specs":"2 bd · 2 ba · 1,597 sq ft · 2-car garage · one level","tier":"match","fits":["One-level Weaver patio home","Sunroom/flex room"],"missing":["2 bedrooms only","About 7 miles north"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Cranberry-Township/2104-Isleworth-Ln-16066/home/74813683"}]},
+    {"id":"s-eloquent","name":"2403 Eloquent Ln","town":"Adams Crossing (Valencia)","lat":40.6852,"lng":-79.9787,"price":"$417,900","hoa":"$310/mo HOA","specs":"2 bd · 2 ba · 1,760 sq ft · 2-car garage · one level","tier":"match","fits":["One-level, maintenance-free","Primary bath with walk-in shower","Cherry and granite kitchen with island"],"missing":["2 bedrooms only","About 8 miles northeast"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Valencia/2403-Eloquent-Ln-16059/home/74814579"}]},
+    {"id":"s-walker","name":"101 Walker Ln","town":"Hytyre Farms (Gibsonia)","lat":40.6273,"lng":-79.9172,"price":"$415,000","hoa":"","specs":"3 bd · 2.5 ba patio home · one level","tier":"match","fits":["One-level patio home with 3 bedrooms","Lots of kitchen cabinets"],"missing":["About 9 miles east","Garage size and HOA not shown in listing summary"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Gibsonia/101-Walker-Ln-15044/home/74440632"}]},
+    {"id":"s-grouse","name":"2576 B Grouse Ridge","town":"Wexford (Franklin Park)","lat":40.6035,"lng":-80.0904,"price":"$385,000","hoa":"$140/mo HOA","specs":"3 bd · 2 ba · 2,252 sq ft · 2-car garage","tier":"near","fits":["Next door to Orchard Hill","Level entry from the front door and the garage","First-floor primary suite plus a second first-floor bedroom"],"missing":["Laundry is on the 2nd floor or in the basement","Third bedroom upstairs"],"links":[{"label":"Listing & photos","url":"https://www.redfin.com/PA/Wexford/2576-Grouse-Rdg-15090/unit-B/home/74466527"}]}
+  ]
+}

@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wexford Home Search</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+
+/* Layout: a field binder — header with the brief, a map of the North Hills, then tabbed sections of cards. */
+:root{
+  --bg:#f5f6f3; --surface:#ffffff; --ink:#1f2a27; --muted:#5b6762; --line:#d9ded9;
+  --accent:#2f5d50; --accent-soft:#e3ece8;
+  --ok:#2e6b3f; --ok-bg:#e5f1e7; --warn:#8a5a00; --warn-bg:#fbf0d9; --no:#9b3328; --no-bg:#f8e6e3;
+  --c-senior:#7a4ea3; --c-rental:#1f6fae; --c-owner:#2f7d5a; --c-listing:#c46a12; --c-sale:#5f6b73;
+  --display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --body:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141a18; --surface:#1c2421; --ink:#e7ece9; --muted:#9aa8a2; --line:#2e3935;
+  --accent:#8cc5b2; --accent-soft:#22332d;
+  --ok:#8fd19e; --ok-bg:#1d3324; --warn:#f0c46b; --warn-bg:#3a2f16; --no:#f19a8e; --no-bg:#3a1f1b;
+  --c-senior:#b892dc; --c-rental:#6fb0e6; --c-owner:#73c49c; --c-listing:#f0a35a; --c-sale:#a9b4bb;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a18; --surface:#1c2421; --ink:#e7ece9; --muted:#9aa8a2; --line:#2e3935;
+  --accent:#8cc5b2; --accent-soft:#22332d;
+  --ok:#8fd19e; --ok-bg:#1d3324; --warn:#f0c46b; --warn-bg:#3a2f16; --no:#f19a8e; --no-bg:#3a1f1b;
+  --c-senior:#b892dc; --c-rental:#6fb0e6; --c-owner:#73c49c; --c-listing:#f0a35a; --c-sale:#a9b4bb;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+header.top{padding-block:28px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(1.8rem,4.5vw,2.6rem);font-weight:650;margin-top:4px}
+.lede{max-width:68ch;color:var(--muted);margin:10px 0 0}
+.brief{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding:0;list-style:none}
+.brief li{background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:4px 12px;font-size:.88rem}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;font-size:.88rem;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+main{padding-block:22px 48px;display:grid;gap:28px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.plan h2{font-size:1.35rem}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:12px;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding-left:34px;position:relative;font-size:.95rem}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--surface);font-weight:700;font-size:.82rem;display:grid;place-items:center}
+.steps b{display:block}
+#map{height:min(62vh,520px);min-height:340px;border-radius:var(--r);border:1px solid var(--line);background:var(--accent-soft);z-index:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.88rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.mapnote{font-size:.85rem;color:var(--muted);margin-top:6px}
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:10px;z-index:5;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+nav.tabs button{font:inherit;font-size:.92rem;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+nav.tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+nav.tabs .n{font-variant-numeric:tabular-nums;opacity:.8;font-weight:500}
+section.group{display:grid;gap:14px}
+section.group>header h2{font-size:1.5rem}
+section.group>header p{margin:4px 0 0;color:var(--muted);max-width:72ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h3{font-size:1.15rem;font-weight:650}
+.card .sub{font-size:.88rem;color:var(--muted);margin-top:2px}
+.kv{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.9rem;font-variant-numeric:tabular-nums}
+.kv .price{font-weight:700}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 9px;border-radius:999px;align-self:flex-start}
+.tag.match{background:var(--ok-bg);color:var(--ok)}
+.tag.near,.tag.verify{background:var(--warn-bg);color:var(--warn)}
+.tag.long{background:var(--no-bg);color:var(--no)}
+.typebar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.type{font-size:.78rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
+ul.fit,ul.miss{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:.92rem}
+ul.fit li,ul.miss li{padding-left:22px;position:relative}
+ul.fit li::before{content:"✓";position:absolute;left:2px;color:var(--ok);font-weight:700}
+ul.miss li::before{content:"✗";position:absolute;left:3px;color:var(--no);font-weight:700}
+.ask{font-size:.88rem;background:var(--accent-soft);border-radius:8px;padding:8px 10px}
+.ask b{font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.9rem;margin-top:auto;padding-top:4px;border-top:1px dashed var(--line)}
+.actions a{font-weight:600;text-decoration:none}
+.actions a:hover{text-decoration:underline}
+.phone{font-size:.88rem;color:var(--muted);user-select:all}
+.mapbtn{font:inherit;font-size:.9rem;font-weight:600;color:var(--accent);background:none;border:0;padding:0;cursor:pointer}
+.empty{color:var(--muted);font-style:italic}
+details.method{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px}
+details.method summary{cursor:pointer;font-weight:600}
+details.method ul{margin:8px 0 0;padding-left:20px;max-width:75ch}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-block:18px 30px}
+.leaflet-popup-content{font-family:var(--body);font-size:13px}
+.leaflet-popup-content b{font-size:14px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top"><div class="wrap">
+  <div class="eyebrow">North Hills &amp; southern Butler County · Rent first, buy only if plans change</div>
+  <h1>Wexford Home Search</h1>
+  <p class="lede">One-floor homes with an attached garage near Orchard Hill Church, for a move by the end of April 2027. Each place below is checked against the same list. Green means it fits, amber means it's close or needs a phone call to confirm.</p>
+  <ul class="brief" aria-label="What we're looking for">
+    <li>All living on one floor</li><li>Primary bedroom + laundry on the main floor</li><li>Attached 2-car garage</li><li>2+ full baths</li><li>3 bedrooms (2 if roomy)</li><li>Dishwasher, good cabinets, pantry a plus</li><li>Walk-in shower preferred</li><li>Lawn &amp; snow handled</li><li>Rent up to $3,500/mo</li><li>55+ communities OK · no pets</li>
+  </ul>
+  <div class="meta"><span>Updated <b>October 20, 2026</b></span><span>Next update <b>mid-November 2026</b></span><span>Distances are straight-line miles from Orchard Hill Church, 2551 Brandt School Rd</span></div>
+</div></header>
+
+<main class="wrap">
+  <section class="plan" aria-labelledby="plan-h">
+    <h2 id="plan-h">How to use this list</h2>
+    <ol class="steps">
+      <li><b>Now through January</b>Call the senior-cottage and rental communities. Ask about April 2027 availability and get on waitlists. Waitlists cost little and are the slow part.</li>
+      <li><b>February–March</b>Rentals for April start appearing. This page switches to weekly updates then.</li>
+      <li><b>Today's rentals</b>Most will be leased long before April. They're here to show what the money buys and which neighborhoods have the right kind of home.</li>
+      <li><b>Homes for sale</b>Only if plans change. They're also a guide to which patio-home communities to watch for owners who rent.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="map-h">
+    <h2 id="map-h" style="font-size:1.35rem;margin-bottom:10px">Map</h2>
+    <div id="map" role="region" aria-label="Map of places on this list"></div>
+    <div class="legend" id="legend"></div>
+    <p class="mapnote">The dashed circle is 5 miles from Orchard Hill Church. Tap a pin for details.</p>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="Filter the list"></nav>
+  <div id="groups" style="display:grid;gap:34px"></div>
+
+  <details class="method">
+    <summary>How this list was put together</summary>
+    <ul>
+      <li>Rentals and homes for sale come from Redfin, which also carries many Zillow rental listings. Zillow blocked direct searching. Community details come from each community's own website, cited on its card.</li>
+      <li>Listings rarely say everything. When a listing leaves out something on our list, the card says so and suggests what to ask, rather than guessing.</li>
+      <li>Checked and ruled out: Cumberland Woods Village, Vincentian Terrace Place, The Village at St. Barnabas, Hampton Fields Village and Concordia at Cabot (apartments without garages); Masonic Village at Sewickley (no rental option, about $8,400/mo plus entrance fee); Hunters Point and Park Place townhomes (bedrooms upstairs); Venango Trails (no one-level plans found).</li>
+      <li>"Photos" links open the listing or community website, where the photos and floor plans belong to their owners.</li>
+      <li>Prices and availability change quickly. Treat anything here as a lead to confirm by phone.</li>
+    </ul>
+  </details>
+</main>
+
+<footer><div class="wrap">Prepared for a private family home search. Not affiliated with any listing site, builder or community. Prices and availability as of the update date above.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+const DATA = {"groups": {"senior": [{"id": "c-woodlands", "name": "The Woodlands at St. Barnabas", "town": "Valencia · St. Barnabas campus", "lat": 40.678, "lng": -79.988, "address": "100 Laurel Oak Dr, Valencia, PA 16059", "price": "Monthly rent, about $3,000–$5,000 (third-party estimate)", "specs": "One-level carriage homes · 2 bd + den or 3 bd · 2 baths · 1- or 2-car garage", "tier": "match", "fits": ["Every home is one level, with a laundry room inside", "2-bedroom plans have 2 full baths; the Laurel plan (2 bd + den, 1,660 sq ft) has a 2-car-size garage", "Rented by the month; St. Barnabas says there's no large entrance fee", "Meals delivered twice a day, golf, heated pool and fitness center, 24-hour security; nursing care on the same campus if ever needed"], "missing": ["About 7 miles northeast", "Prices aren't published; the low end of the estimate fits the budget, the high end doesn't", "Some plans have only a 1-car garage", "Walk-in showers and lawn/snow wording not confirmed"], "ask": "Current rent for a 2-bedroom with a 2-car garage? Walk-in shower? Lawn and snow included? Age minimum? Waitlist for April 2027?", "links": [{"label": "Community page & floor plans", "url": "https://stbarnabashealthsystem.com/senior-living/independent-living/the-woodlands/"}], "phone": "724-444-5568 (tours) · 724-443-0700 (main)"}, {"id": "c-whitetail", "name": "White Tail Ridge", "town": "Gibsonia (Richland Twp) · St. Barnabas campus", "lat": 40.6396, "lng": -79.9375, "address": "1005 Paul Revere Dr, Gibsonia, PA 15044", "price": "$1,850–$2,100/mo", "specs": "2-bedroom plans: one level · 2 baths · 2-car garage · laundry room", "tier": "match", "fits": ["The 2-bedroom plans (2BR-A, 2BR-B) are one level with 2 baths, a laundry room and a 2-car garage", "Listed for rent by the month: 2 bd about $1,850, 3 bd about $2,100", "Lawn care and snow removal included in the lease (per the rental listing)", "St. Barnabas restaurants, pool and medical center on campus; 24-hour security"], "missing": ["About 8 miles east, off the preferred corridors", "Avoid the 3-bedroom plan, which has an upstairs loft", "Age requirement not published", "Walk-in showers not mentioned"], "ask": "Is there an age minimum? Which units are the one-level 2-bedroom plans? Walk-in shower? Can we get on the list for April 2027?", "links": [{"label": "St. Barnabas page & floor plans", "url": "https://stbarnabashealthsystem.com/senior-living/independent-living/white-tail-ridge/"}, {"label": "Rental listing & photos", "url": "https://www.apartments.com/white-tail-ridge-gibsonia-pa/v1pb37d/"}], "phone": "724-443-0700 (St. Barnabas) · 724-604-4247 (leasing)"}, {"id": "c-vincentian", "name": "Vincentian Villa patio homes", "town": "McCandless (North Hills)", "lat": 40.5605, "lng": -80.02, "address": "911 Vincent Way, Pittsburgh, PA 15237", "price": "$150,000 entrance fee + $4,150–$4,875/mo for two", "specs": "Patio homes · 2 bd / 2 ba · about 1,320–1,390 sq ft", "tier": "near", "fits": ["The only cottage-style senior homes within about 5 miles", "2 bedrooms, 2 baths", "Lawn, landscaping and snow removal handled; transportation within 5 miles", "Personal care and memory care on the same campus"], "missing": ["Not a rental: $150,000 entrance fee (70% refundable)", "Monthly fee is over budget for two people", "Garage not confirmed online"], "ask": "Do the patio homes have attached garages? Is there any rental option for a patio home?", "links": [{"label": "Community page", "url": "https://vincentian.us/locations/vincentian-villa"}, {"label": "2026–27 rate sheet (PDF)", "url": "https://vincentian.us/wp-content/uploads/2026/07/FY27-Rate-Sheet_IL-Combined.pdf"}], "phone": "412-364-6592"}, {"id": "c-passavant", "name": "Passavant Community cottages & carriage homes", "town": "Zelienople · Lutheran SeniorLife (farther out)", "lat": 40.7895, "lng": -80.1385, "address": "105 Burgess Dr, Zelienople, PA 16063", "price": "Monthly fee; about $5,000–$7,000 (third-party estimate)", "specs": "Single-story cottages & carriage homes · up to 3 bd / 2 ba · 2-car garage", "tier": "long", "fits": ["Best physical match found: one level, 2 full baths with walk-in showers, 2-car garages", "Home and yard maintenance, utilities and a dining allowance included", "Personal care, rehab and nursing on campus"], "missing": ["About 13 miles north", "Likely over budget", "Age requirement not published"], "ask": "Current monthly fee for a 2-bedroom carriage home? Any entrance fee? Waitlist length?", "links": [{"label": "Community page", "url": "https://www.lutheranseniorlife.org/location/passavant-community"}, {"label": "Carriage homes", "url": "https://www.lutheranseniorlife.org/community/carriage-homes"}], "phone": "724-452-5400 (sales)"}, {"id": "c-sherwood", "name": "Sherwood Oaks garage homes", "town": "Cranberry Twp · UPMC Senior Communities", "lat": 40.7025, "lng": -80.1142, "address": "100 Norman Dr, Cranberry Township, PA 16066", "price": "Entrance fee from about $384,000 + about $8,000/mo for two", "specs": "Willow (2 bd) & Oak (3 bd) homes · oversized attached 2-car garage", "tier": "long", "fits": ["The Willow and Oak homes have oversized attached 2-car garages", "Lawn, snow, utilities, housekeeping and meals included", "Full life care on campus"], "missing": ["Well over budget", "Not a rental: large entrance fee", "Age 62+"], "ask": "Listed for comparison only.", "links": [{"label": "Floor plans", "url": "https://www.sherwood-oaks.com/floor-plans-amenities/"}], "phone": "724-776-8100"}], "rental": [{"id": "c-freedomcrossing", "name": "Freedom Crossing", "town": "West edge of Cranberry Twp (Freedom mailing address)", "lat": 40.6809, "lng": -80.1535, "address": "500 Franklin Blvd, Freedom, PA 15042", "price": "3 bd from about $1,572/mo", "specs": "Ranch apartments, no steps · 3 bd/2 ba up to about 1,410 sq ft · attached garage", "tier": "verify", "fits": ["Advertised as single-level ranch apartments with no steps", "Attached, direct-entry garages", "3-bedroom, 2-bath plans", "Washer and dryer in each home", "Far below budget"], "missing": ["Garage is probably 1-car (not confirmed)", "Modest size for 3 bedrooms", "Kitchen finishes and showers not described", "About 6 miles out, past Cranberry"], "ask": "1-car or 2-car garage? Do any units have a walk-in shower? Is lawn and snow included? How far ahead do you take April move-ins?", "links": [{"label": "Listing & photos", "url": "https://www.apartmentsearch.com/apartments/pennsylvania/freedom/freedom-crossing"}], "phone": "724-952-3651 (Universal Development)"}], "owner": [{"id": "c-blueberry", "name": "Blueberry Hill (55+)", "town": "Wexford (Marshall Twp)", "lat": 40.6389, "lng": -80.0946, "address": "236 Huckleberry Ct, Wexford, PA 15090", "price": "Resale about $300,000+", "hoa": "HOA about $180–$300/mo", "specs": "Attached condos, 1–3 bd · some one-level · 1- or 2-car garages", "tier": "match", "fits": ["Closest community on the list, about 2 miles from Orchard Hill", "55+ neighbors", "First-floor primary suite and laundry are standard; some units are fully one level", "HOA covers lawn, snow and exterior"], "missing": ["Built 1978–2002, so kitchens vary", "Many units have only a 1-car garage", "Not known whether owners may rent out units"], "ask": "Ask a local agent or the HOA whether rentals are allowed and to watch for one-level units with a 2-car garage.", "links": [{"label": "Community info & photos", "url": "https://www.55places.com/pennsylvania/communities/blueberry-hill"}], "phone": ""}, {"id": "c-villagepine", "name": "Village at Pine: carriage homes", "town": "Wexford (Pine Twp)", "lat": 40.6293, "lng": -80.0477, "address": "801 Village Club Dr, Wexford, PA 15090", "price": "Resale about $700,000", "hoa": "Quarterly HOA", "specs": "52 carriage homes · first-floor owner's suite · 2-car garage", "tier": "near", "fits": ["About 2.5 miles away, walkable to Market District", "First-floor owner's suite and main-floor laundry", "HOA handles yard and snow"], "missing": ["Homes also have an upper loft and lower level", "Only 52 homes, and pricey", "No carriage-home rentals found"], "ask": "Worth a standing request with a local agent in case an owner decides to rent.", "links": [{"label": "Neighborhood info", "url": "https://www.tarasa.com/wexford/village-at-pine/"}], "phone": ""}, {"id": "c-cobblestone-ohio", "name": "Cobblestone patio homes", "town": "Ohio Twp (Avonworth schools)", "lat": 40.5394, "lng": -80.0866, "address": "132 Cobblestone Dr, Pittsburgh, PA 15237", "price": "Resale about $435,000–$475,000", "hoa": "About $146–$196/mo", "specs": "One-level patio homes · 2 bd/2 ba · 2-car garage", "tier": "match", "fits": ["True one-level living", "2-car garages", "Pool and clubhouse", "Two homes for sale right now, so owners do turn over"], "missing": ["Mostly 2 bedrooms", "About 5 miles south"], "ask": "Does the HOA allow rentals?", "links": [{"label": "Current listing & photos", "url": "https://www.redfin.com/PA/Pittsburgh/132-Cobblestone-Dr-15237/home/74447534"}], "phone": ""}, {"id": "c-sewickleyridge", "name": "Sewickley Ridge (55+)", "town": "Ohio Twp · Traditions of America", "lat": 40.5372, "lng": -80.1198, "address": "113 Presidents Dr, Sewickley, PA 15143", "price": "Resale about $490,000", "hoa": "About $326/mo", "specs": "Single-level homes · 2 bd/2 ba · 2-car garage", "tier": "match", "fits": ["Single-level homes built for 55+ living", "2-car garages", "Built 2016, so kitchens are modern"], "missing": ["About 5 miles southwest", "Mostly 2 bedrooms", "Leasing rules not published"], "ask": "Does the HOA allow rentals, and with what minimum lease?", "links": [{"label": "Current listing & photos", "url": "https://www.redfin.com/PA/Sewickley/113-Presidents-Dr-15143/home/109232826"}], "phone": "215-732-9600 (Traditions of America)"}, {"id": "c-crescent", "name": "Crescent: first-floor-living townhomes", "town": "Cranberry Twp · Charter Homes", "lat": 40.6933, "lng": -80.0906, "address": "102 Ramsgate Rd, Cranberry Township, PA 16066", "price": "Owner rentals about $3,300–$3,500/mo", "specs": "New townhomes · 3 bd/3 ba · first-floor primary · 2-car garage", "tier": "near", "fits": ["Owners are already renting these out, within budget", "New construction with modern kitchens", "Primary bedroom and laundry on the first floor; 2-car garage", "Trails and a lake"], "missing": ["Two stories (two bedrooms upstairs)", "Lawn and snow coverage not confirmed", "Rent sits near the top of the budget", "About 6 miles north"], "ask": "Ask Charter which owners rent out the first-floor-primary plan (T3020), and whether the HOA covers lawn and snow.", "links": [{"label": "Community & floor plans", "url": "https://www.charterhomes.com/crescent"}], "phone": "412-426-3020 (Charter sales)"}, {"id": "c-toacranberry", "name": "Traditions of America at Cranberry (55+)", "town": "Cranberry Twp", "lat": 40.6996, "lng": -80.1479, "address": "289 Jefferson Ln, Cranberry Township, PA 16066", "price": "Resale about $590,000", "hoa": "About $315/mo", "specs": "102 homes · one-level ranch plans · 2-car garage", "tier": "match", "fits": ["True one-level ranch plans with main-level primary suite and laundry", "2-car garages, clubhouse and pool", "Built 2017–2020"], "missing": ["Owner-occupied; whether owners may rent is not published", "Expensive to buy", "About 7 miles north"], "ask": "Does the HOA allow leasing? What does the HOA fee cover?", "links": [{"label": "Community info & photos", "url": "https://www.55places.com/pennsylvania/communities/traditions-of-america-at-cranberry"}], "phone": "215-732-9600 (Traditions of America)"}, {"id": "c-toarichland", "name": "Traditions of America at Richland (55+)", "town": "Gibsonia (Richland Twp)", "lat": 40.6602, "lng": -79.9805, "address": "4121 Bakerstown Rd, Gibsonia, PA 15044", "price": "Resale about $515,000–$715,000", "hoa": "About $262–$310/mo", "specs": "About 157 patio homes · first-floor owner's suite · 2-car garage", "tier": "match", "fits": ["Every home has a first-floor owner's suite; the second floor is optional", "2-car garages", "Clubhouse, pool, pickleball; built 2019 on"], "missing": ["Owner-occupied; leasing rules not published", "About 7 miles east"], "ask": "Does the HOA allow leasing? What does the HOA fee cover?", "links": [{"label": "Community info", "url": "https://www.55places.com/pennsylvania/communities/traditions-of-america-richland"}], "phone": "215-732-9600 (Traditions of America)"}, {"id": "c-isleworth", "name": "Villas at Isleworth (Bellevue Park)", "town": "Cranberry Twp · Weaver Homes", "lat": 40.7012, "lng": -80.1265, "address": "2084 Isleworth Ln, Cranberry Township, PA 16066", "price": "Resale about $445,000–$485,000", "hoa": "About $385/mo", "specs": "One-level patio homes · 2 bd + den · 2-car garage", "tier": "match", "fits": ["One-level living with main-level laundry", "2-car attached garages", "Sidewalk neighborhood next to The Village shops"], "missing": ["2 bedrooms plus a den", "About 7 miles north", "Leasing rules not published"], "ask": "Does the HOA allow rentals?", "links": [{"label": "Current listing & photos", "url": "https://www.redfin.com/PA/Cranberry-Twp/2084-Isleworth-Ln-16066/home/74813686"}], "phone": ""}, {"id": "c-pinnacle", "name": "Pinnacle at Adams (55+)", "town": "Mars (Adams Twp)", "lat": 40.7158, "lng": -80.0, "address": "145 Resolution Dr, Mars, PA 16046", "price": "Resale about $600,000–$750,000", "specs": "55 homes · single-level living standard · 2-car garage", "tier": "near", "fits": ["HOA covers lawn, leaves, snow and exterior (confirmed)", "Single-level plans with first-floor primary suite", "2-car garages"], "missing": ["Small, with nothing listed now", "Expensive", "About 9 miles northeast", "Leasing rules not published"], "ask": "Does the HOA allow rentals?", "links": [{"label": "Community info", "url": "https://www.55places.com/pennsylvania/communities/pinnacle-at-adams"}], "phone": ""}, {"id": "c-gladerun", "name": "Glade Run Ranch Homes", "town": "Zelienople · Ryan Homes (farther out)", "lat": 40.795, "lng": -80.137, "address": "111 Settlers Grove Blvd, Zelienople, PA 16063", "price": "New from about $491,000", "specs": "New single-level ranches · 3 bd/2 ba · 2-car garage", "tier": "near", "fits": ["Meets every item on the list: one level, 3 bedrooms, 2-car garage", "Lawn care and snow removal handled", "Brand-new kitchens"], "missing": ["About 13 miles north, well past Cranberry", "Purchase only, new construction"], "ask": "Only if buying.", "links": [{"label": "Community & floor plans", "url": "https://www.ryanhomes.com/new-homes/communities/10222120152787/pennsylvania/zelienople/glade-run-ranch-homes"}], "phone": "412-516-3350 (Ryan Homes sales)"}], "listing": [{"id": "r-cottonwood", "name": "221 Cottonwood Ln", "town": "Wexford (Marshall Twp)", "lat": 40.629, "lng": -80.0711, "price": "$3,200/mo", "specs": "3 bd · 2.5 ba · 2,050 sq ft · built-in garage", "tier": "verify", "fits": ["Public records list it as a one-story home (ranch), with a finished lower level below", "Close in: under 2 miles from Orchard Hill", "Lawn care included", "Kitchen getting granite and new cabinet fronts; all 3 baths getting quartz", "Primary suite with its own bath", "Washer and dryer in the home"], "missing": ["Listing doesn't say where the laundry is (main floor or lower level)", "Garage size not stated", "Snow removal not mentioned", "Comes up for rent now; would need to still be open in spring"], "ask": "Is the laundry on the main floor? Is the garage 2-car? Is snow removal included? Would the owner hold it or re-list in spring?", "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Wexford/221-Cottonwood-Ln-15090/home/74772165"}], "phone": "724-776-3686 (listing agent)"}, {"id": "r-tenpoint", "name": "516 Ten Point Ln", "town": "Cranberry Township", "lat": 40.689, "lng": -80.1267, "price": "$2,095/mo", "specs": "3 bd · 2 ba townhouse · 2-car garage", "tier": "verify", "fits": ["2-car garage", "Owner pays the HOA, which usually covers lawn and snow", "Two full baths", "Well under budget"], "missing": ["Listing doesn't say how many floors or where the bedrooms and laundry are", "Kitchen lists a fridge and stove only; no dishwasher mentioned", "Plain finishes (carpet, vinyl)", "About 6 miles out"], "ask": "Is it one level? Where are the bedrooms and laundry? Is there a dishwasher? Does the HOA handle lawn and snow?", "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Cranberry-Township/516-Ten-Point-Ln-16066/home/74797143"}], "phone": "833-634-0811 (HomeRiver Group)"}, {"id": "r-sussex", "name": "411 Sussex Dr", "town": "Cranberry Township", "lat": 40.6913, "lng": -80.1154, "price": "$2,500/mo", "specs": "4 bd · 2 ba ranch · 1,352 sq ft · 1-car garage", "tier": "near", "fits": ["True one-level ranch", "Renovated kitchen with quartz counters and plenty of pantry space", "Two full baths", "Washer and dryer in the home"], "missing": ["Only a 1-car attached garage (long driveway for the second car)", "Fenced yard; lawn and snow are probably the tenant's job", "Smaller rooms: 4 bedrooms in 1,352 sq ft", "About 6 miles out"], "ask": "Who handles lawn and snow? Is there a walk-in shower?", "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Cranberry-Township/411-Sussex-Dr-16066/home/74790383"}], "phone": ""}, {"id": "r-grandview", "name": "1301 Grandview Ave", "town": "Glenshaw (Shaler Twp)", "lat": 40.5212, "lng": -79.9553, "price": "$2,650/mo", "specs": "3 bd + in-law suite · 2 full baths on main · attached garage", "tier": "near", "fits": ["One-level living: primary suite, 2 more bedrooms, 2 full baths and laundry all on the main floor", "Attached garage", "Brick home on a corner lot", "Available December 1"], "missing": ["Shaler is southeast, outside your target area (about 9 miles)", "Garage size not stated", "Lawn and snow are probably the tenant's job", "Basement in-law suite is space you'd pay for and not use"], "ask": "Is the garage 2-car? Is there a step-free way in from the garage?", "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Glenshaw/1301-Grandview-Ave-15116/home/74596383"}], "phone": "724-933-6300 (listing agent)"}, {"id": "r-sonie", "name": "305 Sonie Dr", "town": "Franklin Park (Sewickley mailing address)", "lat": 40.5684, "lng": -80.1138, "price": "$2,100/mo", "specs": "3 bd · 2.5 ba townhouse · first-floor primary", "tier": "near", "fits": ["Primary bedroom and laundry on the first floor", "About 3 miles from Orchard Hill", "Community pool"], "missing": ["Two other bedrooms are upstairs", "Galley kitchen", "Garage not mentioned"], "ask": "Is there an attached garage? Is the first-floor bath a full bath with a shower?", "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Sewickley/305-Sonie-Dr-15143/home/74439944"}], "phone": ""}, {"id": "r-adamspointe", "name": "248 Adams Pointe Blvd #2", "town": "Mars (Adams Twp)", "lat": 40.6845, "lng": -80.0362, "price": "$1,950/mo", "specs": "2 bd · 2 ba condo · one level", "tier": "near", "fits": ["Everything on one level, including laundry off the kitchen", "Two full baths, one with each bedroom", "Gated community with pool, fitness center, walking trail and staff security"], "missing": ["Likely an upstairs unit (it has a balcony), so there may be stairs to the door", "Parking is in a garage lot, not an attached garage", "Small for two people: 2 bedrooms, no third room"], "ask": "Is the unit on the ground floor or is there an elevator? Where is the garage?", "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Mars/248-Adams-Pointe-Blvd-16046/unit-2/home/73660433"}], "phone": "724-933-6300 (listing agent)"}], "sale": [{"id": "s-huckleberry200", "name": "200 Huckleberry Ct", "town": "Wexford · Blueberry Hill 55+", "lat": 40.6387, "lng": -80.0959, "price": "$302,000", "hoa": "$300/mo HOA", "specs": "2 bd · 2 ba · 1,120 sq ft · 2-car garage · one level", "tier": "match", "fits": ["55+ community 2 miles from Orchard Hill", "One-level living, maintenance-free", "Updated kitchen with quartz counters"], "missing": ["Small: 1,120 sq ft and only 2 bedrooms"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Wexford/200-Huckleberry-Ct-15090/home/73560981"}]}, {"id": "s-cobblestone132", "name": "132 Cobblestone Dr", "town": "Ohio Twp (Avonworth)", "lat": 40.5396, "lng": -80.0871, "price": "$435,000", "hoa": "$146/mo + $136/quarter HOA", "specs": "2 bd · 2 ba · 1,538 sq ft · 2-car garage · one level", "tier": "match", "fits": ["One-level patio home", "Kitchen with large pantry and island", "Primary suite with walk-in closet; shower redone in 2023", "Community pool and clubhouse"], "missing": ["2 bedrooms only", "About 5 miles south"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Pittsburgh/132-Cobblestone-Dr-15237/home/74447534"}]}, {"id": "s-cobblestone142", "name": "142 Cobblestone Dr", "town": "Ohio Twp (Avonworth)", "lat": 40.5392, "lng": -80.0862, "price": "$474,900", "hoa": "$196/mo HOA", "specs": "2 bd · 2 ba · 1,864 sq ft · 2-car garage · one level", "tier": "match", "fits": ["One-level patio home", "Large granite kitchen island", "Community pool and clubhouse"], "missing": ["2 bedrooms only", "About 5 miles south"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Pittsburgh/142-Cobblestone-Dr-15237/home/74447524"}]}, {"id": "s-presidents", "name": "113 Presidents Dr", "town": "Sewickley Ridge 55+ (Ohio Twp)", "lat": 40.5372, "lng": -80.1198, "price": "$487,900", "hoa": "$326/mo HOA", "specs": "2 bd · 2 ba · 1,760 sq ft · 2-car garage · single level", "tier": "match", "fits": ["55+ community built by Traditions of America (2016)", "Single level with sunroom and heated four-season room", "Vaulted great room open to the kitchen"], "missing": ["2 bedrooms only", "About 5 miles southwest"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Sewickley/113-Presidents-Dr-15143/home/109232826"}]}, {"id": "s-linden", "name": "118 Linden Ct", "town": "Seven Fields", "lat": 40.6908, "lng": -80.0645, "price": "$489,000", "hoa": "$370/mo HOA", "specs": "2 bd + bonus room · 2.5 ba · 2,300 sq ft · 2-car garage", "tier": "match", "fits": ["First-floor, maintenance-free patio home", "Granite kitchen, stainless appliances, hardwood floors", "Bonus room that could be a third bedroom or office"], "missing": ["Listing mentions a bedroom and full bath on the first floor; check where the second bedroom is"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Seven-Fields/118-Linden-Ct-16046/home/73666160"}]}, {"id": "s-ashford11", "name": "11 Ashford Dr", "town": "Cranberry Township", "lat": 40.6874, "lng": -80.1258, "price": "$350,000", "hoa": "$380/mo HOA", "specs": "3 bd · 2.5 ba · 2-car garage · main-level living", "tier": "near", "fits": ["Patio home with renovated kitchen and new floors", "Clubhouse and pool"], "missing": ["Has an upstairs loft/guest suite (the main-level rooms are what you'd use)"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Cranberry-Township/11-Ashford-Dr-16066/home/73649085"}]}, {"id": "s-isleworth2084", "name": "2084 Isleworth Ln", "town": "Cranberry · Villas at Isleworth", "lat": 40.7012, "lng": -80.1262, "price": "$485,000", "hoa": "$385/mo HOA", "specs": "2 bd + den · 2 ba · 1,821 sq ft · 2-car garage · one level", "tier": "match", "fits": ["One-level Weaver patio home", "Updated kitchen with double pantries", "Main-level laundry; sunroom; den could be a third bedroom"], "missing": ["About 7 miles north"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Cranberry-Twp/2084-Isleworth-Ln-16066/home/74813686"}]}, {"id": "s-isleworth2104", "name": "2104 Isleworth Ln", "town": "Cranberry · Villas at Isleworth", "lat": 40.7011, "lng": -80.1269, "price": "$445,000", "hoa": "$385/mo HOA", "specs": "2 bd · 2 ba · 1,597 sq ft · 2-car garage · one level", "tier": "match", "fits": ["One-level Weaver patio home", "Sunroom/flex room"], "missing": ["2 bedrooms only", "About 7 miles north"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Cranberry-Township/2104-Isleworth-Ln-16066/home/74813683"}]}, {"id": "s-eloquent", "name": "2403 Eloquent Ln", "town": "Adams Crossing (Valencia)", "lat": 40.6852, "lng": -79.9787, "price": "$417,900", "hoa": "$310/mo HOA", "specs": "2 bd · 2 ba · 1,760 sq ft · 2-car garage · one level", "tier": "match", "fits": ["One-level, maintenance-free", "Primary bath with walk-in shower", "Cherry and granite kitchen with island"], "missing": ["2 bedrooms only", "About 8 miles northeast"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Valencia/2403-Eloquent-Ln-16059/home/74814579"}]}, {"id": "s-walker", "name": "101 Walker Ln", "town": "Hytyre Farms (Gibsonia)", "lat": 40.6273, "lng": -79.9172, "price": "$415,000", "hoa": "", "specs": "3 bd · 2.5 ba patio home · one level", "tier": "match", "fits": ["One-level patio home with 3 bedrooms", "Lots of kitchen cabinets"], "missing": ["About 9 miles east", "Garage size and HOA not shown in listing summary"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Gibsonia/101-Walker-Ln-15044/home/74440632"}]}, {"id": "s-grouse", "name": "2576 B Grouse Ridge", "town": "Wexford (Franklin Park)", "lat": 40.6035, "lng": -80.0904, "price": "$385,000", "hoa": "$140/mo HOA", "specs": "3 bd · 2 ba · 2,252 sq ft · 2-car garage", "tier": "near", "fits": ["Next door to Orchard Hill", "Level entry from the front door and the garage", "First-floor primary suite plus a second first-floor bedroom"], "missing": ["Laundry is on the 2nd floor or in the basement", "Third bedroom upstairs"], "links": [{"label": "Listing & photos", "url": "https://www.redfin.com/PA/Wexford/2576-Grouse-Rdg-15090/unit-B/home/74466527"}]}]}};
+const CENTER = {lat:40.6074, lng:-80.0886, name:"Orchard Hill Church"};
+const MERCY = {lat:40.4363, lng:-79.9853, name:"UPMC Mercy", addr:"1400 Locust St, Pittsburgh, PA 15219"};
+const TYPES = {
+  senior:{label:"Senior cottages", color:"--c-senior"},
+  rental:{label:"Rental communities", color:"--c-rental"},
+  owner:{label:"Patio-home & 55+ communities", color:"--c-owner"},
+  listing:{label:"Rentals on the market now", color:"--c-listing"},
+  sale:{label:"For sale (if plans change)", color:"--c-sale"}
+};
+const GROUP_TEXT = {
+  senior:"Independent-living homes on a retirement campus: one floor, a garage, upkeep handled, and care on site if needs ever change. The two St. Barnabas communities rent by the month. The others charge large entrance fees and are here for comparison.",
+  rental:"Purpose-built rental communities with one-floor homes and attached garages are rare here. This is the only one found besides White Tail Ridge (listed under senior cottages).",
+  owner:"Neighborhoods built for one-floor living, where the association handles lawn and snow. Homes here are mostly owned, but owners do rent them out, so these are the places to watch for an April rental.",
+  listing:"Rentals listed today within about 10 miles. They'll mostly be gone by April; they show what the budget buys.",
+  sale:"One-level homes for sale within about 10 miles, under roughly $550,000. Only relevant if you decide to buy."
+};
+const TIER = {match:"Fits the list", near:"Close, with trade-offs", verify:"Promising, call to confirm", long:"Long shot"};
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function miles(a,b,c,d){const R=3958.8,t=x=>x*Math.PI/180;const dl=t(c-a),dn=t(d-b);const h=Math.sin(dl/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function gdir(from,to){return "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(from)+"&destination="+encodeURIComponent(to)}
+
+const items=[];
+for(const [k,arr] of Object.entries(DATA.groups)) for(const x of arr){x.group=k; x.d=miles(CENTER.lat,CENTER.lng,x.lat,x.lng); items.push(x);}
+const TORD={match:0,verify:1,near:2,long:3};
+for(const k in DATA.groups) DATA.groups[k].sort((a,b)=>TORD[a.tier]-TORD[b.tier]||a.d-b.d);
+
+let map=null, markers={};
+function initMap(){
+  if(!window.L){document.getElementById("map").innerHTML='<p class="empty" style="padding:16px">The map couldn\'t load here. The list below has every place.</p>';return;}
+  map=L.map("map",{scrollWheelZoom:false}).setView([CENTER.lat,CENTER.lng],11);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map).once("tileerror",()=>{document.querySelector(".mapnote").textContent="The street map background didn't load in this view; the pins are still in the right places. The dashed circle is 5 miles from Orchard Hill Church.";});
+  L.circle([CENTER.lat,CENTER.lng],{radius:8046.7,color:css("--accent"),weight:2,dashArray:"6 6",fill:false}).addTo(map);
+  L.circleMarker([CENTER.lat,CENTER.lng],{radius:8,color:css("--ink"),weight:3,fillColor:css("--surface"),fillOpacity:1}).addTo(map).bindPopup("<b>Orchard Hill Church</b><br>2551 Brandt School Rd, Wexford");
+  const pts=[];
+  for(const x of items){
+    const m=L.circleMarker([x.lat,x.lng],{radius:x.group==="sale"?6:8,color:css("--surface"),weight:2,fillColor:css(TYPES[x.group].color),fillOpacity:.95}).addTo(map);
+    m.bindPopup(`<b>${esc(x.name)}</b><br>${esc(x.town)}<br>${esc(x.price||"")}${x.price?"<br>":""}${x.d.toFixed(1)} mi from Orchard Hill<br><a href="#card-${x.id}">See details</a>`);
+    markers[x.id]=m; pts.push([x.lat,x.lng]);
+  }
+  pts.push([CENTER.lat,CENTER.lng]);
+  map.fitBounds(pts,{padding:[24,24]});
+}
+function legend(){
+  const el=document.getElementById("legend");
+  el.innerHTML=`<span><i class="dot" style="background:var(--surface);box-shadow:0 0 0 3px var(--ink)"></i>Orchard Hill Church</span>`+
+    Object.entries(TYPES).map(([k,t])=>`<span><i class="dot" style="background:var(${t.color})"></i>${t.label}</span>`).join("");
+}
+function card(x){
+  const t=TYPES[x.group];
+  const kv=[x.price?`<span class="price">${esc(x.price)}</span>`:"", x.hoa?`<span>${esc(x.hoa)}</span>`:"", `<span>${x.d.toFixed(1)} mi</span>`].join("");
+  const links=(x.links||[]).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("");
+  const addr=x.address||`${x.name}, ${x.town.split("·")[0].split("(")[0].trim()}, PA`;
+  return `<article class="card" id="card-${x.id}">
+    <div class="typebar"><span class="type"><i class="dot" style="background:var(${t.color})"></i>${t.label}</span><span class="tag ${x.tier}">${TIER[x.tier]}</span></div>
+    <div><h3>${esc(x.name)}</h3><div class="sub">${esc(x.town)}</div></div>
+    <div class="kv">${kv}</div>
+    ${x.specs?`<div class="kv">${esc(x.specs)}</div>`:""}
+    ${x.fits?.length?`<ul class="fit">${x.fits.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>`:""}
+    ${x.missing?.length?`<ul class="miss">${x.missing.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>`:""}
+    ${x.ask?`<div class="ask"><b>Ask:</b> ${esc(x.ask)}</div>`:""}
+    ${x.phone?`<div class="phone">☎ ${esc(x.phone)}</div>`:""}
+    <div class="actions">${links}
+      <a href="${gdir("2551 Brandt School Rd, Wexford, PA 15090",addr)}" target="_blank" rel="noopener">Drive from Orchard Hill ↗</a>
+      <a href="${gdir(addr,MERCY.addr)}" target="_blank" rel="noopener">Drive to UPMC Mercy ↗</a>
+      ${map?`<button class="mapbtn" data-id="${x.id}">Show on map</button>`:""}
+    </div>
+  </article>`;
+}
+let current="all";
+function render(){
+  const g=document.getElementById("groups");
+  g.innerHTML=Object.keys(TYPES).filter(k=>DATA.groups[k]?.length && (current==="all"||current===k)).map(k=>`
+    <section class="group" aria-labelledby="h-${k}"><header><h2 id="h-${k}">${TYPES[k].label}</h2><p>${GROUP_TEXT[k]}</p></header>
+    <div class="cards">${DATA.groups[k].map(card).join("")}</div></section>`).join("");
+  g.querySelectorAll(".mapbtn").forEach(b=>b.addEventListener("click",()=>{const m=markers[b.dataset.id]; if(!m)return; document.getElementById("map").scrollIntoView({behavior:"smooth",block:"center"}); map.setView(m.getLatLng(),14); m.openPopup();}));
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===current)));
+  for(const x of items){const m=markers[x.id]; if(!m)continue; const on=current==="all"||current===x.group; m.setStyle({opacity:on?1:.15,fillOpacity:on?.95:.12});}
+}
+function tabs(){
+  const n=k=>k==="all"?items.length:(DATA.groups[k]||[]).length;
+  document.getElementById("tabs").innerHTML=[["all","Everything"],...Object.entries(TYPES).filter(([k])=>n(k)).map(([k,t])=>[k,t.label])]
+    .map(([k,l])=>`<button type="button" id="tab-${k}" data-k="${k}" aria-pressed="false">${l}<span class="n">${n(k)}</span></button>`).join("");
+  document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{current=b.dataset.k;try{localStorage.setItem("whs-tab",current)}catch(e){};render();}));
+}
+try{const s=localStorage.getItem("whs-tab"); if(s && (s==="all"||DATA.groups[s])) current=s;}catch(e){}
+legend(); initMap(); tabs(); render();
+</script>
+
+</body>
+</html>
